@@ -7,6 +7,6 @@ public class Main {
 	static final int HEIGHT = 600;
 	static final String TITLE = "Currency Converter";
 	public static void main(String[] args) {
-		CurrencyConverterFrame frame = new CurrencyConverterFrame(WIDTH, HEIGHT, TITLE, "src/assets/curr_64.png", new Color(15, 170, 255));
+		new CurrencyConverterFrame(WIDTH, HEIGHT, TITLE, "src/assets/curr_64.png", new Color(255, 255, 255));
 	}
 }
