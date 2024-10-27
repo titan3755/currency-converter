@@ -6,6 +6,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 public class CurrencyConverterFrame extends JFrame {
 	
@@ -31,6 +32,21 @@ public class CurrencyConverterFrame extends JFrame {
 		titleLabel.setFont(titleLabel.getFont().deriveFont(30.0f));
 		titleLabel.setForeground(new Color(0, 255, 0));
 		titlePanel.add(titleLabel);	
+		
+		JLabel labelForTextFieldInput = new JLabel("Enter amount to convert");
+		labelForTextFieldInput.setBounds(0, 0, WIDTH, HEIGHT / 8);
+		labelForTextFieldInput.setHorizontalAlignment(JLabel.CENTER);
+		labelForTextFieldInput.setFont(labelForTextFieldInput.getFont().deriveFont(20.0f));
+		labelForTextFieldInput.setForeground(new Color(0, 255, 0));
+		greenPanel.add(labelForTextFieldInput);
+		
+		JTextField textFieldInput = new JTextField("amount");
+		textFieldInput.setBounds(0, HEIGHT / 4, WIDTH, HEIGHT / 8);
+		textFieldInput.setHorizontalAlignment(JTextField.LEFT);
+		textFieldInput.setFont(textFieldInput.getFont().deriveFont(20.0f));
+		textFieldInput.setForeground(new Color(0, 255, 0));
+		textFieldInput.setBackground(backgroundColor);
+		greenPanel.add(textFieldInput);
 		
 		this.setSize(WIDTH, HEIGHT);
 		this.setTitle(title);
