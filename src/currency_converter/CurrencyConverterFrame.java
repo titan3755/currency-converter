@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 
 import javax.swing.BorderFactory;
+import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -32,9 +33,17 @@ public class CurrencyConverterFrame extends JFrame {
 		greenPanel.setBackground(backgroundColor);
 		greenPanel.setBounds(0, HEIGHT / 8, WIDTH, HEIGHT / 8);
 		
+		JPanel convertFromTitlePanel = new JPanel();
+		convertFromTitlePanel.setBackground(backgroundColor);
+		convertFromTitlePanel.setBounds(0, HEIGHT / 4, WIDTH / 2, HEIGHT / 8);
+		
 		JPanel convertFromPanel = new JPanel();
 		convertFromPanel.setBackground(backgroundColor);
 		convertFromPanel.setBounds(0, HEIGHT / 4, WIDTH / 2, HEIGHT / 8);
+		
+		JPanel convertToTitlePanel = new JPanel();
+		convertToTitlePanel.setBackground(backgroundColor);
+		convertToTitlePanel.setBounds(WIDTH / 2, HEIGHT / 4, WIDTH / 2, HEIGHT / 8);
 		
 		JPanel convertToPanel = new JPanel();
 		convertToPanel.setBackground(backgroundColor);
@@ -77,8 +86,8 @@ public class CurrencyConverterFrame extends JFrame {
 		textFieldInput.setForeground(new Color(0, 0, 0));
 		greenPanel.add(textFieldInput);
 		
-		JLabel labelForComboBoxFrom = new JLabel("Convert from  ");
-		labelForComboBoxFrom.setBounds(0, HEIGHT / 4, WIDTH / 2, HEIGHT / 8);
+		JLabel labelForComboBoxFrom = new JLabel("Convert from");
+		labelForComboBoxFrom.setBounds(labelForComboBoxFrom.getX(), labelForComboBoxFrom.getY(), WIDTH / 2, HEIGHT / 8);
 		labelForComboBoxFrom.setBorder(new javax.swing.border.LineBorder(new Color(0, 255, 0), 2, true));
 		labelForComboBoxFrom.setBorder(BorderFactory.createCompoundBorder(new EmptyBorder(10, 10, 10, 10), new LineBorder(Color.GREEN, 2)));
 		labelForComboBoxFrom.setFont(new Font("Liberation Mono", Font.PLAIN, 20));
@@ -86,9 +95,15 @@ public class CurrencyConverterFrame extends JFrame {
 		labelForComboBoxFrom.setVerticalAlignment(JLabel.CENTER);
 		labelForComboBoxFrom.setFont(labelForComboBoxFrom.getFont().deriveFont(20.0f));
 		labelForComboBoxFrom.setForeground(new Color(0, 255, 0));
-		convertFromPanel.add(labelForComboBoxFrom);
+		labelForComboBoxFrom.setBackground(backgroundColor);
+		convertFromTitlePanel.add(labelForComboBoxFrom);
 		
-		JList<String> listFrom = new JList<String>(currencyCodes);
+		DefaultListModel<String> l1 = new DefaultListModel<String>();
+		for (int i = 0; i < currencyCodes.length; i++) {
+			l1.addElement(currencyCodes[i]);
+		}
+		
+		JList<String> listFrom = new JList<String>(l1);
 		listFrom.setBounds(0, HEIGHT / 4, WIDTH / 2, HEIGHT / 8);
 		listFrom.setBorder(new javax.swing.border.LineBorder(new Color(0, 255, 0), 2, true));
 		listFrom.setBackground(new Color(0, 255, 0));
@@ -96,8 +111,8 @@ public class CurrencyConverterFrame extends JFrame {
 		listFrom.setForeground(new Color(0, 0, 0));
 		convertFromPanel.add(listFrom);
 		
-		JLabel labelForComboBoxTo = new JLabel("Convert to  ");
-		labelForComboBoxTo.setBounds(0, 0, WIDTH / 2, HEIGHT / 8);
+		JLabel labelForComboBoxTo = new JLabel("Convert to");
+		labelForComboBoxTo.setBounds(labelForComboBoxTo.getPreferredSize().width, 0, WIDTH / 2, HEIGHT / 8);
 		labelForComboBoxTo.setBorder(new javax.swing.border.LineBorder(new Color(0, 255, 0), 2, true));
 		labelForComboBoxTo.setBorder(BorderFactory.createCompoundBorder(new EmptyBorder(10, 10, 10, 10), new LineBorder(Color.GREEN, 2)));
 		labelForComboBoxTo.setFont(new Font("Liberation Mono", Font.PLAIN, 20));
@@ -105,9 +120,15 @@ public class CurrencyConverterFrame extends JFrame {
 		labelForComboBoxTo.setVerticalAlignment(JLabel.CENTER);
 		labelForComboBoxTo.setFont(labelForComboBoxTo.getFont().deriveFont(20.0f));
 		labelForComboBoxTo.setForeground(new Color(0, 255, 0));
-		convertToPanel.add(labelForComboBoxTo);
+		labelForComboBoxTo.setBackground(backgroundColor);
+		convertToTitlePanel.add(labelForComboBoxTo);
 		
-		JList<String> listTo = new JList<String>(currencyCodes);
+		DefaultListModel<String> l2 = new DefaultListModel<String>();
+		for (int i = 0; i < currencyCodes.length; i++) {
+			l2.addElement(currencyCodes[i]);
+		}
+		
+		JList<String> listTo = new JList<String>(l2);
 		listTo.setBounds(0, HEIGHT / 4, WIDTH / 2, HEIGHT / 8);
 		listTo.setBorder(new javax.swing.border.LineBorder(new Color(0, 255, 0), 2, true));
 		listTo.setBackground(new Color(0, 255, 0));
@@ -153,6 +174,8 @@ public class CurrencyConverterFrame extends JFrame {
 		this.setVisible(true);
 		this.add(titlePanel);
 		this.add(greenPanel);
+		this.add(convertFromTitlePanel);
+		this.add(convertToTitlePanel);
 		this.add(convertFromPanel);
 		this.add(convertToPanel);
 		this.add(convertButtonPanel);
