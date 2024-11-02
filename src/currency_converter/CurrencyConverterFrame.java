@@ -4,12 +4,11 @@ import java.awt.Color;
 import java.awt.Font;
 
 import javax.swing.BorderFactory;
-import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
@@ -39,7 +38,7 @@ public class CurrencyConverterFrame extends JFrame {
 		
 		JPanel convertFromPanel = new JPanel();
 		convertFromPanel.setBackground(backgroundColor);
-		convertFromPanel.setBounds(0, HEIGHT / 4, WIDTH / 2, HEIGHT / 8);
+		convertFromPanel.setBounds(0, HEIGHT / 4 + 80, WIDTH / 2, HEIGHT / 8);
 		
 		JPanel convertToTitlePanel = new JPanel();
 		convertToTitlePanel.setBackground(backgroundColor);
@@ -47,7 +46,7 @@ public class CurrencyConverterFrame extends JFrame {
 		
 		JPanel convertToPanel = new JPanel();
 		convertToPanel.setBackground(backgroundColor);
-		convertToPanel.setBounds(WIDTH / 2, HEIGHT / 4, WIDTH / 2, HEIGHT / 8);
+		convertToPanel.setBounds(WIDTH / 2, HEIGHT / 4 + 80, WIDTH / 2, HEIGHT / 8);
 		
 		JPanel convertButtonPanel = new JPanel();
 		convertButtonPanel.setBackground(backgroundColor);
@@ -56,6 +55,10 @@ public class CurrencyConverterFrame extends JFrame {
 		JPanel resultPanel = new JPanel();
 		resultPanel.setBackground(backgroundColor);
 		resultPanel.setBounds(0, HEIGHT / 2 + HEIGHT / 8, WIDTH, HEIGHT / 8);
+		
+		JPanel apiKeyPanel = new JPanel();
+		apiKeyPanel.setBackground(backgroundColor);
+		apiKeyPanel.setBounds(0, HEIGHT / 2 + HEIGHT / 8 + 80, WIDTH, HEIGHT / 8);
 		
 		JLabel titleLabel = new JLabel(title);
         titleLabel.setBounds(0, 0, WIDTH, HEIGHT / 8);
@@ -98,18 +101,14 @@ public class CurrencyConverterFrame extends JFrame {
 		labelForComboBoxFrom.setBackground(backgroundColor);
 		convertFromTitlePanel.add(labelForComboBoxFrom);
 		
-		DefaultListModel<String> l1 = new DefaultListModel<String>();
-		for (int i = 0; i < currencyCodes.length; i++) {
-			l1.addElement(currencyCodes[i]);
-		}
-		
-		JList<String> listFrom = new JList<String>(l1);
-		listFrom.setBounds(0, HEIGHT / 4, WIDTH / 2, HEIGHT / 8);
-		listFrom.setBorder(new javax.swing.border.LineBorder(new Color(0, 255, 0), 2, true));
-		listFrom.setBackground(new Color(0, 255, 0));
-		listFrom.setFont(new Font("Liberation Mono", Font.PLAIN, 20));
-		listFrom.setForeground(new Color(0, 0, 0));
-		convertFromPanel.add(listFrom);
+		JComboBox<String> comboBoxFrom = new JComboBox<String>(currencyCodes);
+		comboBoxFrom.setBounds(0, HEIGHT / 4 + 200, WIDTH / 2, HEIGHT / 8);
+		comboBoxFrom.setLocation(0, HEIGHT / 4 + 200);
+		comboBoxFrom.setBorder(new javax.swing.border.LineBorder(new Color(0, 255, 0), 2, true));
+		comboBoxFrom.setBackground(new Color(0, 255, 0));
+		comboBoxFrom.setFont(new Font("Liberation Mono", Font.PLAIN, 20));
+		comboBoxFrom.setForeground(new Color(0, 0, 0));
+		convertFromPanel.add(comboBoxFrom);
 		
 		JLabel labelForComboBoxTo = new JLabel("Convert to");
 		labelForComboBoxTo.setBounds(labelForComboBoxTo.getPreferredSize().width, 0, WIDTH / 2, HEIGHT / 8);
@@ -123,18 +122,14 @@ public class CurrencyConverterFrame extends JFrame {
 		labelForComboBoxTo.setBackground(backgroundColor);
 		convertToTitlePanel.add(labelForComboBoxTo);
 		
-		DefaultListModel<String> l2 = new DefaultListModel<String>();
-		for (int i = 0; i < currencyCodes.length; i++) {
-			l2.addElement(currencyCodes[i]);
-		}
-		
-		JList<String> listTo = new JList<String>(l2);
-		listTo.setBounds(0, HEIGHT / 4, WIDTH / 2, HEIGHT / 8);
-		listTo.setBorder(new javax.swing.border.LineBorder(new Color(0, 255, 0), 2, true));
-		listTo.setBackground(new Color(0, 255, 0));
-		listTo.setFont(new Font("Liberation Mono", Font.PLAIN, 20));
-		listTo.setForeground(new Color(0, 0, 0));
-		convertToPanel.add(listTo);
+		JComboBox<String> comboBoxTo = new JComboBox<String>(currencyCodes);
+		comboBoxTo.setBounds(0, HEIGHT / 4 + 200, WIDTH / 2, HEIGHT / 8);
+		comboBoxTo.setLocation(0, HEIGHT / 4 + 200);
+		comboBoxTo.setBorder(new javax.swing.border.LineBorder(new Color(0, 255, 0), 2, true));
+		comboBoxTo.setBackground(new Color(0, 255, 0));
+		comboBoxTo.setFont(new Font("Liberation Mono", Font.PLAIN, 20));
+		comboBoxTo.setForeground(new Color(0, 0, 0));
+		convertToPanel.add(comboBoxTo);
 		
 		JLabel labelForTextFieldResult = new JLabel("Result  ", SwingConstants.CENTER);
 		labelForTextFieldResult.setBounds(0, 0, WIDTH, HEIGHT / 8);
@@ -163,6 +158,29 @@ public class CurrencyConverterFrame extends JFrame {
         convertButton.setFont(new Font("Liberation Mono", Font.PLAIN, 20));
         convertButton.setForeground(new Color(0, 0, 0));
         convertButtonPanel.add(convertButton);
+        
+        JLabel labelForTextFieldApiKey = new JLabel("Enter your API key  ");
+        labelForTextFieldApiKey.setBounds
+        (0, 0, WIDTH, HEIGHT / 8);
+        labelForTextFieldApiKey.setBorder
+        (new javax.swing.border.LineBorder(new Color(0, 255, 0), 2, true));
+        labelForTextFieldApiKey.setBorder
+        (BorderFactory.createCompoundBorder(new EmptyBorder(10, 10, 10, 10), new LineBorder(Color.GREEN, 2)));
+        labelForTextFieldApiKey.setFont(new Font("Liberation Mono", Font.PLAIN, 20));
+        labelForTextFieldApiKey.setHorizontalAlignment(JLabel.CENTER);
+        labelForTextFieldApiKey.setVerticalAlignment(JLabel.CENTER);
+        labelForTextFieldApiKey.setFont(labelForTextFieldApiKey.getFont().deriveFont(20.0f));
+        labelForTextFieldApiKey.setForeground(new Color(0, 255, 0));
+        apiKeyPanel.add(labelForTextFieldApiKey);
+        
+        JTextField textFieldApiKey = new JTextField("key", 6);
+		textFieldApiKey.setBounds(0, HEIGHT / 4 + 200, WIDTH, HEIGHT / 8);	
+		textFieldApiKey.setBorder(new javax.swing.border.LineBorder(new Color(0, 255, 0), 2, true));
+		textFieldApiKey.setBackground(new Color(0, 255, 0));
+		textFieldApiKey.setHorizontalAlignment(JTextField.CENTER);
+		textFieldApiKey.setFont(textFieldApiKey.getFont().deriveFont(20.0f));
+		textFieldApiKey.setForeground(new Color(0, 0, 0));
+		apiKeyPanel.add(textFieldApiKey);
 		
 		this.setSize(WIDTH, HEIGHT);
 		this.setTitle(title);
@@ -180,6 +198,7 @@ public class CurrencyConverterFrame extends JFrame {
 		this.add(convertToPanel);
 		this.add(convertButtonPanel);
 		this.add(resultPanel);
+		this.add(apiKeyPanel);
 		
         ImageIcon icon = new ImageIcon(iconPath);
         this.setIconImage(icon.getImage());
