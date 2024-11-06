@@ -1,5 +1,10 @@
 package currency_converter;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
 import java.awt.Color;
 import java.awt.Font;
 
@@ -14,14 +19,22 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
+import javax.swing.event.DocumentListener;
 
 public class CurrencyConverterFrame extends JFrame {
 	
 	/**
 	 * 
 	 */
+	private static final boolean isDebug = true;
 	private static final long serialVersionUID = 1L;
 	public static final String[] currencyCodes = {"USD", "BDT", "EUR", "GBP", "INR", "JPY", "KRW", "RUB", "TRY", "ZAR", "AUD", "CAD", "CNY", "HKD", "IDR", "MYR", "NZD", "SGD", "THB", "VND", "BRL", "CLP", "MXN", "ARS", "COP", "PEN", "UYU", "EGP", "ILS", "SAR", "AED", "QAR", "KWD", "BHD", "OMR", "JOD", "LBP", "PKR", "PHP", "LKR", "NPR", "DKK", "NOK", "SEK", "CHF", "CZK", "HUF", "PLN", "RON", "HRK", "RSD", "BGN", "ISK", "GEL", "AMD", "AZN", "KZT", "UZS", "TJS", "TMT", "BYN", "MDL", "ALL", "MKD", "BAM", "EUR", "CHF", "GBP", "JPY", "AUD", "CAD", "CNY", "HKD", "IDR", "MYR", "NZD", "SGD", "THB", "VND", "BRL", "CLP", "MXN", "ARS", "COP", "PEN", "UYU", "EGP", "ILS", "SAR", "AED", "QAR", "KWD", "BHD", "OMR", "JOD", "LBP", "PKR", "PHP", "LKR", "NPR", "DKK", "NOK", "SEK", "CHF", "CZK", "HUF", "PLN", "RON", "HRK", "RSD", "BGN", "ISK", "GEL", "AMD", "AZN", "KZT", "UZS", "TJS", "TMT", "BYN", "MDL", "ALL", "MKD", "BAM", "EUR", "CHF", "GBP", "JPY", "AUD", "CAD", "CNY", "HKD", "IDR", "MYR", "NZD", "SGD", "THB", "VND", "BRL"};
+	public static String convertTextFieldData = "";
+	public static String convertFromComboBoxData = "";
+	public static String convertToComboBoxData = "";
+	public static String convertButtonData = "";
+	public static String convertResultTextFieldData = "";
+	public static String apiKeyTextFieldData = "";
 
 	public CurrencyConverterFrame(int WIDTH, int HEIGHT, String title, String iconPath, Color backgroundColor) {
 		JPanel titlePanel = new JPanel();
@@ -87,6 +100,22 @@ public class CurrencyConverterFrame extends JFrame {
 		textFieldInput.setHorizontalAlignment(JTextField.CENTER);
 		textFieldInput.setFont(textFieldInput.getFont().deriveFont(20.0f));
 		textFieldInput.setForeground(new Color(0, 0, 0));
+		textFieldInput.getDocument().addDocumentListener(new DocumentListener() {
+			@Override
+			public void insertUpdate(javax.swing.event.DocumentEvent e) {
+				
+			}
+
+			@Override
+			public void removeUpdate(javax.swing.event.DocumentEvent e) {
+				System.out.println("removeUpdate");
+			}
+
+			@Override
+			public void changedUpdate(javax.swing.event.DocumentEvent e) {
+				System.out.println("changedUpdate");
+			}
+		});
 		greenPanel.add(textFieldInput);
 		
 		JLabel labelForComboBoxFrom = new JLabel("Convert from");
@@ -149,6 +178,7 @@ public class CurrencyConverterFrame extends JFrame {
 		textFieldResult.setHorizontalAlignment(JTextField.CENTER);
 		textFieldResult.setFont(textFieldResult.getFont().deriveFont(20.0f));
 		textFieldResult.setForeground(new Color(0, 0, 0));
+		textFieldResult.setEditable(false);
 		resultPanel.add(textFieldResult);
 		
         JButton convertButton = new JButton("Convert");
@@ -203,6 +233,108 @@ public class CurrencyConverterFrame extends JFrame {
         ImageIcon icon = new ImageIcon(iconPath);
         this.setIconImage(icon.getImage());
         
+	}
+	
+	public static void createLatestCurrencyData() {
+		String printer = "";
+		try {
+			File file = new File("latest_currency_data.json");
+			if (file.createNewFile()) {
+                printer = isDebug ? "File created: " + file.getName() : "";
+            } else {
+                printer = isDebug ? "File already exists." : "";
+            }
+		} catch (IOException e) {
+			printer = isDebug ? "An error occurred." : "";
+		}
+		System.out.println(printer);
+	}
+	
+	public static void writeLatestCurrencyData(String currencyData) {
+		String printer = "";
+		try {
+			FileWriter fileWriter = new FileWriter("latest_currency_data.json");
+			fileWriter.write(currencyData);
+			fileWriter.close();
+			printer = isDebug ? "Successfully wrote to the file." : "";
+		} catch (IOException e) {
+			printer = isDebug ? "An error occurred." : "";
+		}
+		System.out.println(printer);
+	}
+	
+	public static void deleteLatestCurrencyData() {
+		String printer = "";
+		File file = new File("latest_currency_data.json");
+		if (file.delete()) {
+			printer = isDebug ? "Deleted the file: " + file.getName() : "";
+		} else {
+			printer = isDebug ? "Failed to delete the file" : "";
+		}
+		System.out.println(printer);
+	}
+	
+	public static String readLatestCurrencyData() {
+		String data = "";
+		try {
+			File file = new File("latest_currency_data.json");
+			if (file.exists()) {
+				System.out.println("File exists.");
+			} else {
+				System.out.println("File does not exist.");
+				return "";
+			}
+			Scanner scanner = new Scanner(file);
+			while (scanner.hasNextLine()) {
+				data = scanner.nextLine();
+			}
+			scanner.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		return data;
+	}
+	
+	public static void setTextFieldData(JTextField textField, String data) {
+		if (isNumeric(data)) {
+			textField.setText(data);
+			convertTextFieldData = data;
+		} else {
+			System.out.println("Error: setTextFieldData");
+		}
+	}
+	
+	public static void setTextFieldData(JTextField textField, String data, String fromTo) {
+		if (isNumeric(data)) {
+			textField.setText(data);
+			if (fromTo.equals("result")) {
+				convertResultTextFieldData = data;
+			} else {
+				System.out.println("Error: setTextFieldData");
+			}
+		} else {
+			System.out.println("Error: setTextFieldData");
+		}
+	}
+	
+	public static void setComboBoxData(JComboBox<String> comboBox, String fromTo, String data) {
+		comboBox.setSelectedItem(data);
+		if (fromTo.equals("from")) {
+			convertFromComboBoxData = data;
+		} else if (fromTo.equals("to")) {
+			convertToComboBoxData = data;
+		} else {
+			System.out.println("Error: setComboBoxData");
+		}
+	}
+	
+	public static boolean isNumeric(String str) { 
+	  try {  
+	    Double.parseDouble(str);  
+	    return true;
+	  } catch(NumberFormatException e){  
+	    return false;  
+	  }  
 	}
 	
 }
