@@ -3,6 +3,9 @@ package currency_converter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 import java.awt.Color;
@@ -21,6 +24,9 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentListener;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
 public class CurrencyConverterFrame extends JFrame {
 	
 	/**
@@ -30,11 +36,12 @@ public class CurrencyConverterFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
 	public static final String[] currencyCodes = {"USD", "BDT", "EUR", "GBP", "INR", "JPY", "KRW", "RUB", "TRY", "ZAR", "AUD", "CAD", "CNY", "HKD", "IDR", "MYR", "NZD", "SGD", "THB", "VND", "BRL", "CLP", "MXN", "ARS", "COP", "PEN", "UYU", "EGP", "ILS", "SAR", "AED", "QAR", "KWD", "BHD", "OMR", "JOD", "LBP", "PKR", "PHP", "LKR", "NPR", "DKK", "NOK", "SEK", "CHF", "CZK", "HUF", "PLN", "RON", "HRK", "RSD", "BGN", "ISK", "GEL", "AMD", "AZN", "KZT", "UZS", "TJS", "TMT", "BYN", "MDL", "ALL", "MKD", "BAM", "EUR", "CHF", "GBP", "JPY", "AUD", "CAD", "CNY", "HKD", "IDR", "MYR", "NZD", "SGD", "THB", "VND", "BRL", "CLP", "MXN", "ARS", "COP", "PEN", "UYU", "EGP", "ILS", "SAR", "AED", "QAR", "KWD", "BHD", "OMR", "JOD", "LBP", "PKR", "PHP", "LKR", "NPR", "DKK", "NOK", "SEK", "CHF", "CZK", "HUF", "PLN", "RON", "HRK", "RSD", "BGN", "ISK", "GEL", "AMD", "AZN", "KZT", "UZS", "TJS", "TMT", "BYN", "MDL", "ALL", "MKD", "BAM", "EUR", "CHF", "GBP", "JPY", "AUD", "CAD", "CNY", "HKD", "IDR", "MYR", "NZD", "SGD", "THB", "VND", "BRL"};
 	public static String convertTextFieldData = "";
-	public static String convertFromComboBoxData = "";
-	public static String convertToComboBoxData = "";
+	public static String convertFromComboBoxData = "USD";
+	public static String convertToComboBoxData = "USD";
 	public static String convertButtonData = "";
 	public static String convertResultTextFieldData = "";
 	public static String apiKeyTextFieldData = "";
+	public static JTextField textFieldResult;
 
 	public CurrencyConverterFrame(int WIDTH, int HEIGHT, String title, String iconPath, Color backgroundColor) {
 		JPanel titlePanel = new JPanel();
@@ -103,12 +110,12 @@ public class CurrencyConverterFrame extends JFrame {
 		textFieldInput.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
 			public void insertUpdate(javax.swing.event.DocumentEvent e) {
-				
+				setTextFieldData(textFieldInput.getText());
 			}
 
 			@Override
 			public void removeUpdate(javax.swing.event.DocumentEvent e) {
-				System.out.println("removeUpdate");
+				setTextFieldData(textFieldInput.getText());
 			}
 
 			@Override
@@ -137,6 +144,10 @@ public class CurrencyConverterFrame extends JFrame {
 		comboBoxFrom.setBackground(new Color(0, 255, 0));
 		comboBoxFrom.setFont(new Font("Liberation Mono", Font.PLAIN, 20));
 		comboBoxFrom.setForeground(new Color(0, 0, 0));
+		comboBoxFrom.addActionListener(e -> {
+			System.out.println(comboBoxFrom.getSelectedItem());
+			setComboBoxData("from", (String) comboBoxFrom.getSelectedItem());
+		});
 		convertFromPanel.add(comboBoxFrom);
 		
 		JLabel labelForComboBoxTo = new JLabel("Convert to");
@@ -158,6 +169,10 @@ public class CurrencyConverterFrame extends JFrame {
 		comboBoxTo.setBackground(new Color(0, 255, 0));
 		comboBoxTo.setFont(new Font("Liberation Mono", Font.PLAIN, 20));
 		comboBoxTo.setForeground(new Color(0, 0, 0));
+		comboBoxTo.addActionListener(e -> {
+			System.out.println(comboBoxTo.getSelectedItem());
+			setComboBoxData("to", (String) comboBoxTo.getSelectedItem());
+		});
 		convertToPanel.add(comboBoxTo);
 		
 		JLabel labelForTextFieldResult = new JLabel("Result  ", SwingConstants.CENTER);
@@ -171,7 +186,7 @@ public class CurrencyConverterFrame extends JFrame {
 		labelForTextFieldResult.setForeground(new Color(0, 255, 0));
 		resultPanel.add(labelForTextFieldResult);
 		
-		JTextField textFieldResult = new JTextField("0.0", 6);
+		textFieldResult = new JTextField("0.0", 6);
 		textFieldResult.setBounds(0, HEIGHT / 4 + HEIGHT / 8, WIDTH, HEIGHT / 8);
 		textFieldResult.setBorder(new javax.swing.border.LineBorder(new Color(0, 255, 0), 2, true));
 		textFieldResult.setBackground(new Color(0, 255, 0));
@@ -187,6 +202,9 @@ public class CurrencyConverterFrame extends JFrame {
         convertButton.setBackground(new Color(0, 255, 0));
         convertButton.setFont(new Font("Liberation Mono", Font.PLAIN, 20));
         convertButton.setForeground(new Color(0, 0, 0));
+        convertButton.addActionListener(e -> {
+        	buttonAction();
+        });
         convertButtonPanel.add(convertButton);
         
         JLabel labelForTextFieldApiKey = new JLabel("Enter your API key  ");
@@ -210,6 +228,24 @@ public class CurrencyConverterFrame extends JFrame {
 		textFieldApiKey.setHorizontalAlignment(JTextField.CENTER);
 		textFieldApiKey.setFont(textFieldApiKey.getFont().deriveFont(20.0f));
 		textFieldApiKey.setForeground(new Color(0, 0, 0));
+		textFieldApiKey.getDocument().addDocumentListener(new DocumentListener() {
+			@Override
+			public void insertUpdate(javax.swing.event.DocumentEvent e) {
+				System.out.println(textFieldApiKey.getText());
+				apiKeyTextFieldData = textFieldApiKey.getText();
+			}
+
+			@Override
+			public void removeUpdate(javax.swing.event.DocumentEvent e) {
+				System.out.println(textFieldApiKey.getText());
+				apiKeyTextFieldData = textFieldApiKey.getText();
+			}
+
+			@Override
+			public void changedUpdate(javax.swing.event.DocumentEvent e) {
+				System.out.println("changedUpdate");
+			}
+		});
 		apiKeyPanel.add(textFieldApiKey);
 		
 		this.setSize(WIDTH, HEIGHT);
@@ -295,18 +331,16 @@ public class CurrencyConverterFrame extends JFrame {
 		return data;
 	}
 	
-	public static void setTextFieldData(JTextField textField, String data) {
+	public static void setTextFieldData(String data) {
 		if (isNumeric(data)) {
-			textField.setText(data);
 			convertTextFieldData = data;
 		} else {
 			System.out.println("Error: setTextFieldData");
 		}
 	}
 	
-	public static void setTextFieldData(JTextField textField, String data, String fromTo) {
+	public static void setTextFieldData(String data, String fromTo) {
 		if (isNumeric(data)) {
-			textField.setText(data);
 			if (fromTo.equals("result")) {
 				convertResultTextFieldData = data;
 			} else {
@@ -317,14 +351,46 @@ public class CurrencyConverterFrame extends JFrame {
 		}
 	}
 	
-	public static void setComboBoxData(JComboBox<String> comboBox, String fromTo, String data) {
-		comboBox.setSelectedItem(data);
+	public static void setTextFieldDataStr(String data) {
+		convertTextFieldData = data;
+	}
+	
+	public static void setComboBoxData(String fromTo, String data) {
 		if (fromTo.equals("from")) {
 			convertFromComboBoxData = data;
 		} else if (fromTo.equals("to")) {
 			convertToComboBoxData = data;
 		} else {
 			System.out.println("Error: setComboBoxData");
+		}
+	}
+	
+	public static void buttonAction() {
+		if (convertTextFieldData.equals("") || convertFromComboBoxData.equals("") || convertToComboBoxData.equals("")
+				|| apiKeyTextFieldData.equals("")) {
+			System.out.println("Error: buttonAction");
+			return;
+		} else {
+			System.out.println("Success: buttonAction");
+		}
+		var client = HttpClient.newHttpClient();
+		var request = HttpRequest.newBuilder(URI.create(
+				"https://v6.exchangerate-api.com/v6/" + apiKeyTextFieldData + "/latest/" + convertFromComboBoxData))
+				.header("accept", "application/json").build();
+		try {
+			var response = client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
+			System.out.println(response.body());
+			writeLatestCurrencyData(response.body());
+			Gson gson = new Gson();
+			JsonObject jsonObject = gson.fromJson(response.body(), JsonObject.class);
+			JsonObject conversionRates = jsonObject.getAsJsonObject("conversion_rates");
+			double conversionRate = conversionRates.get(convertToComboBoxData).getAsDouble();
+			double amountToConvert = Double.parseDouble(convertTextFieldData);
+			double convertedAmount = amountToConvert * conversionRate;
+			setTextFieldData(Double.toString(convertedAmount), "result");
+			textFieldResult.setText(Double.toString(convertedAmount));
+		} catch (IOException | InterruptedException e) {
+			e.printStackTrace();
 		}
 	}
 	

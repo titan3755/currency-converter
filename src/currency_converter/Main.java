@@ -7,6 +7,10 @@ public class Main {
 	static final int HEIGHT = 600;
 	static final String TITLE = "Currency Converter";
 	public static void main(String[] args) {
-		new CurrencyConverterFrame(WIDTH, HEIGHT, TITLE, "src/assets/curr_64.png", new Color(15, 15, 20));
+		try {
+			new CurrencyConverterFrame(WIDTH, HEIGHT, TITLE, "src/assets/curr_64.png", new Color(15, 15, 20));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }
