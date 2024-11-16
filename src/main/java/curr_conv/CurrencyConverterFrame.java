@@ -1,4 +1,4 @@
-package currency_converter;
+package curr_conv;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -24,8 +24,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentListener;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 
 public class CurrencyConverterFrame extends JFrame {
 	
@@ -366,6 +365,7 @@ public class CurrencyConverterFrame extends JFrame {
 	}
 	
 	public static void buttonAction() {
+		Gson gson = new Gson();
 		if (convertTextFieldData.equals("") || convertFromComboBoxData.equals("") || convertToComboBoxData.equals("")
 				|| apiKeyTextFieldData.equals("")) {
 			System.out.println("Error: buttonAction");
@@ -380,15 +380,13 @@ public class CurrencyConverterFrame extends JFrame {
 		try {
 			var response = client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
 			System.out.println(response.body());
-			writeLatestCurrencyData(response.body());
-			Gson gson = new Gson();
 			JsonObject jsonObject = gson.fromJson(response.body(), JsonObject.class);
 			JsonObject conversionRates = jsonObject.getAsJsonObject("conversion_rates");
 			double conversionRate = conversionRates.get(convertToComboBoxData).getAsDouble();
-			double amountToConvert = Double.parseDouble(convertTextFieldData);
-			double convertedAmount = amountToConvert * conversionRate;
+			double convertedAmount = Double.parseDouble(convertTextFieldData) * conversionRate;
 			setTextFieldData(Double.toString(convertedAmount), "result");
-			textFieldResult.setText(Double.toString(convertedAmount));
+			textFieldResult.setText(convertResultTextFieldData);
+			writeLatestCurrencyData(response.body());
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}
