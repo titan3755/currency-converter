@@ -3,6 +3,10 @@ package curr_conv;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -321,12 +325,13 @@ public class CurrencyConverterFrame extends JFrame {
 			}
 			Scanner scanner = new Scanner(file);
 			while (scanner.hasNextLine()) {
-				data = scanner.nextLine();
+				data += scanner.nextLine();
 			}
 			scanner.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
+		System.out.println("The data from the file: " + data);
 		return data;
 	}
 	
@@ -366,8 +371,10 @@ public class CurrencyConverterFrame extends JFrame {
 	
 	public static void buttonAction() {
 		Gson gson = new Gson();
+		boolean fileExists = checkIfFileExists();
+		boolean fileExistsAndIsValid = checkIfFileExistsAndIsValid();
 		if (convertTextFieldData.equals("") || convertFromComboBoxData.equals("") || convertToComboBoxData.equals("")
-				|| apiKeyTextFieldData.equals("")) {
+				|| (!fileExists && apiKeyTextFieldData.equals("")) || (!fileExistsAndIsValid && apiKeyTextFieldData.equals(""))) {
 			System.out.println("Error: buttonAction");
 			return;
 		} else {
@@ -378,18 +385,88 @@ public class CurrencyConverterFrame extends JFrame {
 				"https://v6.exchangerate-api.com/v6/" + apiKeyTextFieldData + "/latest/" + convertFromComboBoxData))
 				.header("accept", "application/json").build();
 		try {
-			var response = client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
-			System.out.println(response.body());
-			JsonObject jsonObject = gson.fromJson(response.body(), JsonObject.class);
-			JsonObject conversionRates = jsonObject.getAsJsonObject("conversion_rates");
-			double conversionRate = conversionRates.get(convertToComboBoxData).getAsDouble();
-			double convertedAmount = Double.parseDouble(convertTextFieldData) * conversionRate;
-			setTextFieldData(Double.toString(convertedAmount), "result");
-			textFieldResult.setText(convertResultTextFieldData);
-			writeLatestCurrencyData(response.body());
+	        String responseData = readLatestCurrencyData();
+	        boolean isData = false;
+	        if (!responseData.isEmpty()) {
+	            JsonObject rd = gson.fromJson(responseData, JsonObject.class);
+	            JsonPrimitive time = rd.getAsJsonPrimitive("time_last_update_utc");
+	            String timeString = time.getAsString();
+	            String day = null;
+	            try {
+	                day = timeString.split(",")[0];
+	            } catch (Exception e) {
+	                e.printStackTrace();
+	            }
+	            System.out.println("INFO:" + day);
+	            System.out.println("INFO:" + getCurrentDay());
+	            if (timeString != null && day != null && day.equals(getCurrentDay())) {
+	                JsonObject conversionRates = rd.getAsJsonObject("conversion_rates");
+	                double conversionRate = conversionRates.get(convertToComboBoxData).getAsDouble();
+	                double convertedAmount = Double.parseDouble(convertTextFieldData) * conversionRate;
+	                setTextFieldData(Double.toString(convertedAmount), "result");
+	                textFieldResult.setText(Double.toString(convertedAmount));
+	                isData = true;
+	                return;
+	            } else {
+	            	isData = false;
+	            }
+	       }
+	       if (!isData) {
+				var response = client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
+				JsonObject jsonObject = gson.fromJson(response.body(), JsonObject.class);
+				JsonObject conversionRates = jsonObject.getAsJsonObject("conversion_rates");
+				double conversionRate = conversionRates.get(convertToComboBoxData).getAsDouble();
+				double convertedAmount = Double.parseDouble(convertTextFieldData) * conversionRate;
+				setTextFieldData(Double.toString(convertedAmount), "result");
+				textFieldResult.setText(convertResultTextFieldData);
+				writeLatestCurrencyData(response.body());
+	        }
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static boolean checkIfFileExists() {
+		File file = new File("latest_currency_data.json");
+		if (file.exists()) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public static boolean checkIfFileExistsAndIsValid() {
+		String data = readLatestCurrencyData();
+		if (data.isEmpty()) {
+			return false;
+		}
+		try {
+			Gson gson = new Gson();
+            JsonObject rd = gson.fromJson(data, JsonObject.class);
+            JsonPrimitive time = rd.getAsJsonPrimitive("time_last_update_utc");
+            String timeString = time.getAsString();
+            String day = null;
+            try {
+                day = timeString.split(",")[0];
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+			if (timeString != null && day != null && day.equals(getCurrentDay())) {
+				return true;
+			} else {
+				return false;
+			}
+		} catch (Exception e) {
+			return false;
+		}	
+	}
+	
+	public static String getCurrentDay() {
+		Calendar calendar = Calendar.getInstance();
+		Date date = calendar.getTime();
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EE", Locale.ENGLISH);
+		String day = simpleDateFormat.format(date.getTime());
+		return day;
 	}
 	
 	public static boolean isNumeric(String str) { 

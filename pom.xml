@@ -3,6 +3,9 @@
   <groupId>com.currency_converter</groupId>
   <artifactId>curr_conv</artifactId>
   <version>0.0.1-SNAPSHOT</version>
+   <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
   <dependencies>
   	 <dependency>
 	  <groupId>com.google.code.gson</groupId>
